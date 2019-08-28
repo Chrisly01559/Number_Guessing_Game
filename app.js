@@ -10,7 +10,7 @@ Game function:
 // Game values
 let min = 1,
     max = 10,
-    winningNum = 2,
+    winningNum = getRandomNum(min, max),
     guessesLeft = 3;
 
 // UI Elements
@@ -26,6 +26,14 @@ const game = document.getElementById('game'),
 minNum.textContent = min;
 maxNum.textContent = max;
 
+// Play again event listner
+
+game.addEventListener('mousedown', function(e) {
+    if(e.target.className === 'play-again') {
+        window.location.reload();
+    }
+});
+
 // Listen for guess
 guessBtn.addEventListener('click', function() {
     let guess = parseInt(guessInput.value);
@@ -37,21 +45,55 @@ guessBtn.addEventListener('click', function() {
 
     // Check if won
     if(guess === winningNum) {
-        // Disable input
-        guessInput.disabled = true;
+        // Game over won
+        gameOver(true,`${winningNum} is correct!, YOU`);
 
-        // Change border color
-        guessInput.style.borderColor = 'green';
-
-        // Set message
-        setMessage(`${winningNum} is correct!, YOU`, 'green');
     } else {
+        // Wrong number
+        guessesLeft -= 1;
+        if(guessesLeft === 0) {
+            // Game over lost
+ 
+            gameOver(false, `Game over, you lost. The correct number was ${winningNum}`);
+        } else {
+            // Game continues - answer wrong
 
+           gameOver(false, `${guess} is not correct, ${guessesLeft} guesses left` );
+
+        }
     }
 });
+// Game over
+function gameOver(won, msg) {
+    let color;
+    
+    won === true ? color = 'green' : color = 'red';
+    
+    // Disable input
+    guessInput.disabled = true;
 
+    // Change border color
+    guessInput.style.borderColor = color;
+
+    // Set text color
+    message.style.color = color;
+
+    // Set message
+    setMessage(msg, color);
+    
+    // Play again
+    guessBtn.value = 'Play Again?';
+    guessBtn.className += 'play-again';
+        
+}
+
+// Get winning number
+function getRandomNum(min, max){
+   return Math.floor(Math.random()*(max - min + 1) + min);
+}
 // Set message
 function setMessage(msg, color) {
     message.style.color = color;
     message.textContent = msg;
 }
+
